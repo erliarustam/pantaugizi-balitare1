@@ -1,0 +1,8 @@
+{
+  "name": "rev1 PantauGizi Balita",
+  "description": "Sistem Pemantauan Antropometri \u0026 Intervensi Gizi Terpadu Balita sesuai standar WHO 2006 \u0026 Kemenkes RI dengan KMS Digital, Deteksi Stunting, dan Manajemen Posyandu.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

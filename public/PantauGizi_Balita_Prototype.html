@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PantauGizi Balita - Prototype Lengkap Standar WHO 2006</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    .font-mono { font-family: 'JetBrains Mono', monospace; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Top Reference Banner -->
+  <div class="bg-gradient-to-r from-emerald-800 via-teal-800 to-emerald-900 text-white text-[11px] font-medium px-4 py-2 text-center flex flex-wrap items-center justify-center gap-2 shadow-sm no-print">
+    <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+    <span class="font-bold">STANDAR RESMI: WHO Child Growth Standards 2006 & Permenkes RI No. 2/2020 • e-PPGBM Compatible</span>
+  </div>
+
+  <!-- Header & Role Switcher -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs no-print">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-extrabold text-lg shadow-md">
+            PG
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h1 class="font-extrabold text-slate-900 text-base sm:text-lg">PantauGizi Balita</h1>
+              <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 font-bold rounded text-[10px] uppercase">
+                Prototype V2.4
+              </span>
+            </div>
+            <p class="text-xs text-slate-500">Sistem Antropometri & Intervensi Stunting Terpadu</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Role Selector -->
+      <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-200 text-xs font-semibold w-full sm:w-auto justify-center">
+        <span class="text-slate-400 px-2 text-[11px] hidden md:inline">Simulasi Peran:</span>
+        <button id="btnRoleParent" onclick="switchRole('PARENT')" class="px-3.5 py-2 rounded-xl transition bg-white text-emerald-700 shadow-sm font-bold">
+          👨‍👩‍👧 Orang Tua
+        </button>
+        <button id="btnRoleKader" onclick="switchRole('KADER')" class="px-3.5 py-2 rounded-xl transition text-slate-600 hover:text-slate-900">
+          🩺 Kader Posyandu
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="max-w-6xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
+
+    <!-- ============================================== -->
+    <!-- SECTION 1: ORANG TUA (PARENT VIEW) -->
+    <!-- ============================================== -->
+    <div id="viewParent" class="space-y-6">
+      <!-- Sub-nav Tabs Orang Tua -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 text-white flex items-center justify-center font-extrabold text-xl shadow-md">
+            <span id="parentChildAvatar">A</span>
+          </div>
+          <div>
+            <span class="text-[10px] uppercase tracking-wider text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+              Buku KIA Terdaftar • KMS Digital
+            </span>
+            <div class="flex items-center gap-2 mt-1">
+              <select id="parentChildSelect" onchange="onSelectChild(this.value)" class="font-bold text-slate-900 text-base bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus:ring-2 focus:ring-emerald-500">
+                <option value="ch-01">Arka Pradana (Laki-laki, 14 Bulan)</option>
+                <option value="ch-03">Kirana Putri (Perempuan, 22 Bulan - Kasus Gizi Kurang)</option>
+                <option value="ch-02">Kinan Pradana (Perempuan, 36 Bulan)</option>
+                <option value="ch-04">Rafi Ahmad (Laki-laki, 28 Bulan)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button onclick="switchParentTab('summary')" id="tabBtnSummary" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white shadow-xs">
+            Ringkasan & Status
+          </button>
+          <button onclick="switchParentTab('chart')" id="tabBtnChart" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+            Kurva KMS & Z-Score
+          </button>
+          <button onclick="switchParentTab('immunization')" id="tabBtnImmunization" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+            Imunisasi & Perkembangan
+          </button>
+          <button onclick="switchParentTab('advice')" id="tabBtnAdvice" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+            Resep MPASI Protein Hewani
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab 1: Ringkasan & Status -->
+      <div id="parentTabSummary" class="space-y-6">
+        <!-- 4 Indikator Antropometri -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Berat Badan / Usia (BB/U)</span>
+            <div id="summaryBbuStatus" class="text-2xl font-black text-slate-900 mt-2">Gizi Baik (Normal)</div>
+            <div id="summaryBbuZScore" class="text-xs text-emerald-700 font-bold mt-1">+0.24 SD (Normal)</div>
+            <div class="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400">Standar WHO 2006</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Panjang/Tinggi (PB/U)</span>
+            <div id="summaryPbuStatus" class="text-2xl font-black text-slate-900 mt-2">Normal</div>
+            <div id="summaryPbuZScore" class="text-xs text-emerald-700 font-bold mt-1">-0.32 SD • Aman dari Stunting</div>
+            <div class="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400">Metode: Terlentang</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status Gizi Akut (BB/PB)</span>
+            <div id="summaryBbpbStatus" class="text-2xl font-black text-slate-900 mt-2">Gizi Baik (Normal)</div>
+            <div class="text-xs text-emerald-700 font-bold mt-1">Proporsi Ideal • Bebas Edema</div>
+            <div class="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400">Status Wasting: Normal</div>
+          </div>
+
+          <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Lingkar Lengan (LiLA)</span>
+            <div id="summaryLila" class="text-2xl font-black text-slate-900 mt-2">14.5 cm</div>
+            <div class="text-xs text-emerald-700 font-bold mt-1">Pita Hijau (&gt;12.5 cm)</div>
+            <div class="mt-3 pt-3 border-t border-slate-100 text-[11px] text-slate-400">Lingkar Kepala: 46.5 cm</div>
+          </div>
+        </div>
+
+        <!-- Banner KMS Digital -->
+        <div class="bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white p-6 rounded-3xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div class="space-y-2 max-w-xl">
+            <span class="bg-emerald-500/30 text-emerald-300 text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border border-emerald-400/30">
+              Dokumen Resmi Kemenkes RI • e-Buku KIA
+            </span>
+            <h3 id="kmsBannerTitle" class="text-2xl font-bold">Kartu Menuju Sehat • Arka Pradana</h3>
+            <p class="text-xs text-emerald-100 leading-relaxed">
+              Catatan pertumbuhan disinkronkan otomatis dari sesi penimbangan di Posyandu Melati A1. Data siap dibawa saat kunjungan imunisasi ke Puskesmas.
+            </p>
+          </div>
+          <div class="flex flex-wrap gap-2.5">
+            <button onclick="openKmsModal()" class="px-5 py-3 bg-white text-emerald-900 hover:bg-emerald-50 font-bold rounded-xl text-xs shadow-md transition">
+              📄 Lihat Lembar KMS Lengkap
+            </button>
+            <button onclick="showToast('Mengunduh dokumen KMS PDF resmi...')" class="px-5 py-3 bg-emerald-700 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs shadow-md border border-emerald-500/50 transition">
+              ⬇ Unduh PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Jadwal Posyandu Terdekat -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex justify-between items-center">
+            <h3 class="font-extrabold text-slate-900 text-sm">Jadwal Penimbangan Posyandu Terdekat</h3>
+            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full font-bold text-xs border border-emerald-200">
+              Posyandu Melati A1
+            </span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50 space-y-1 text-xs">
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Waktu Penimbangan</span>
+              <strong class="text-slate-800 text-sm block">Sabtu, 14 November 2026</strong>
+              <span class="text-slate-500">Pukul 08.00 - 11.30 WIB</span>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50 space-y-1 text-xs">
+              <span class="text-[10px] uppercase font-bold text-slate-400 block">Lokasi & Petugas</span>
+              <strong class="text-slate-800 text-sm block">Balai Warga RT 04 / RW 02</strong>
+              <span class="text-slate-500">Kader Bertugas: Ibu Siti & Tim</span>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-100 bg-slate-50 flex flex-col justify-between text-xs">
+              <div>
+                <span className="text-[10px] uppercase font-bold text-slate-400 block">Status Kehadiran</span>
+                <span id="rsvpBadge" class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                  Terkonfirmasi Hadir
+                </span>
+              </div>
+              <button onclick="toggleRsvp()" class="mt-2 text-xs font-bold text-emerald-700 hover:underline text-left">
+                Ubah Status Kehadiran / Kirim WA Reminder →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Kurva KMS Interaktif -->
+      <div id="parentTabChart" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6 hidden">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div>
+            <h3 class="font-extrabold text-slate-900 text-lg">Kurva Pertumbuhan Balita Standar WHO 2006</h3>
+            <p class="text-xs text-slate-500">Pita warna resmi KMS Kemenkes: Pita Hijau (Normal), Kuning (Waspada), Merah (BGM/KBM)</p>
+          </div>
+          <div class="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl text-xs font-semibold">
+            <span class="px-3 py-1.5 bg-emerald-700 text-white rounded-lg shadow-xs">BB / Usia</span>
+            <span class="px-3 py-1.5 text-slate-600">PB / Usia</span>
+            <span class="px-3 py-1.5 text-slate-600">BB / PB</span>
+          </div>
+        </div>
+
+        <!-- SVG KMS Chart -->
+        <div class="relative bg-slate-50 p-4 rounded-2xl border border-slate-200 overflow-hidden">
+          <svg viewBox="0 0 800 350" class="w-full h-auto select-none">
+            <!-- Grid lines -->
+            <line x1="60" y1="50" x2="760" y2="50" stroke="#e2e8f0" stroke-dasharray="4" />
+            <line x1="60" y1="120" x2="760" y2="120" stroke="#e2e8f0" stroke-dasharray="4" />
+            <line x1="60" y1="190" x2="760" y2="190" stroke="#e2e8f0" stroke-dasharray="4" />
+            <line x1="60" y1="260" x2="760" y2="260" stroke="#e2e8f0" stroke-dasharray="4" />
+
+            <!-- Area Hijau (-2 SD to +2 SD) -->
+            <path d="M 60,260 Q 300,180 760,100 L 760,200 Q 300,260 60,300 Z" fill="#d1fae5" opacity="0.8" />
+            <!-- Area Kuning (-2 SD to -3 SD) -->
+            <path d="M 60,300 Q 300,260 760,200 L 760,240 Q 300,290 60,320 Z" fill="#fef3c7" opacity="0.8" />
+            <!-- Area Merah (< -3 SD BGM) -->
+            <path d="M 60,320 Q 300,290 760,240 L 760,340 L 60,340 Z" fill="#ffe4e6" opacity="0.8" />
+
+            <!-- Boundary lines -->
+            <path d="M 60,260 Q 300,180 760,100" fill="none" stroke="#10b981" stroke-width="2" />
+            <path d="M 60,280 Q 300,220 760,150" fill="none" stroke="#059669" stroke-width="3" />
+            <path d="M 60,300 Q 300,260 760,200" fill="none" stroke="#10b981" stroke-width="2" />
+            <path d="M 60,320 Q 300,290 760,240" fill="none" stroke="#ef4444" stroke-width="2.5" />
+
+            <!-- Trajectory Balita (Points & Line) -->
+            <path id="svgTrajectoryLine" d="M 235,260 L 293,245 L 352,230 L 469,205 L 557,185 L 586,175" fill="none" stroke="#0f172a" stroke-width="3" stroke-linecap="round" />
+            
+            <circle cx="235" cy="260" r="5" fill="#0f172a" stroke="#fff" stroke-width="2" />
+            <circle cx="293" cy="245" r="5" fill="#0f172a" stroke="#fff" stroke-width="2" />
+            <circle cx="352" cy="230" r="5" fill="#0f172a" stroke="#fff" stroke-width="2" />
+            <circle cx="469" cy="205" r="5" fill="#0f172a" stroke="#fff" stroke-width="2" />
+            <circle cx="557" cy="185" r="5" fill="#0f172a" stroke="#fff" stroke-width="2" />
+            <circle cx="586" cy="175" r="7" fill="#059669" stroke="#fff" stroke-width="2.5" />
+
+            <text x="586" y="160" text-anchor="middle" class="text-[11px] font-bold fill-slate-900">10.1 kg (14 Bln)</text>
+            <text x="70" y="340" class="text-[10px] font-bold fill-rose-600">Garis Merah KBM (-3 SD)</text>
+            <text x="70" y="270" class="text-[10px] font-bold fill-emerald-800">Median WHO (0 SD)</text>
+          </svg>
+        </div>
+
+        <!-- Tabel Catatan Buku KIA -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <table class="w-full text-xs text-left">
+            <thead class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+              <tr>
+                <th class="p-3">Tanggal Ukur</th>
+                <th class="p-3">Usia</th>
+                <th class="p-3">Berat Badan</th>
+                <th class="p-3">Panjang/Tinggi</th>
+                <th class="p-3">Z-Score BB/U</th>
+                <th class="p-3">Status Kenaikan</th>
+                <th class="p-3">Kader Petugas</th>
+              </tr>
+            </thead>
+            <tbody id="chartTableBody" class="divide-y divide-slate-100 bg-white">
+              <tr>
+                <td class="p-3 font-semibold text-slate-900">14 Okt 2026</td>
+                <td class="p-3">14 Bulan</td>
+                <td class="p-3 font-bold text-slate-900">10.1 kg</td>
+                <td class="p-3">78.5 cm</td>
+                <td class="p-3 font-mono font-bold text-emerald-700">+0.24 SD</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Naik (N)</span></td>
+                <td class="p-3 text-slate-500">Ibu Siti</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-semibold text-slate-900">14 Sep 2026</td>
+                <td class="p-3">13 Bulan</td>
+                <td class="p-3 font-bold text-slate-900">9.75 kg</td>
+                <td class="p-3">77.2 cm</td>
+                <td class="p-3 font-mono font-bold text-emerald-700">+0.18 SD</td>
+                <td class="p-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Naik (N)</span></td>
+                <td class="p-3 text-slate-500">Ibu Maryam</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Tab 3: Imunisasi & Perkembangan -->
+      <div id="parentTabImmunization" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6 hidden">
+        <h3 class="font-extrabold text-slate-900 text-base">Jadwal Imunisasi Lengkap & Milestone Kembang (KPSP)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-2">
+            <span class="font-bold text-emerald-900 text-sm block">Imunisasi Dasar Lengkap (IDL)</span>
+            <div class="space-y-1.5 text-slate-700">
+              <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-emerald-100">
+                <span>HB-0 (Hepatitis B 0-24 jam)</span>
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">✓ Selesai</span>
+              </div>
+              <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-emerald-100">
+                <span>BCG & Polio 1 (1 Bulan)</span>
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">✓ Selesai</span>
+              </div>
+              <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-emerald-100">
+                <span>DPT-HB-Hib 1, 2, 3 & Polio 2, 3, 4</span>
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">✓ Selesai</span>
+              </div>
+              <div class="flex justify-between items-center bg-white p-2.5 rounded-lg border border-emerald-100">
+                <span>Campak Rubella (MR 1) - 9 Bulan</span>
+                <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">✓ Selesai</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-2">
+            <span class="font-bold text-slate-900 text-sm block">Milestone Motorik & Bahasa (12-15 Bulan)</span>
+            <div class="space-y-1.5 text-slate-700">
+              <div class="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-slate-200">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>Berjalan sendiri beberapa langkah tanpa berpegangan</span>
+              </div>
+              <div class="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-slate-200">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>Mengucapkan 2-3 kata bermakna (Mama, Papa, Mimi)</span>
+              </div>
+              <div class="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-slate-200">
+                <span class="text-emerald-600 font-bold">✓</span>
+                <span>Memasukkan benda kecil ke dalam wadah</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Resep MPASI -->
+      <div id="parentTabAdvice" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6 hidden">
+        <h3 class="font-extrabold text-slate-900 text-base">Rekomendasi Menu MPASI Protein Hewani Ganda</h3>
+        <p class="text-xs text-slate-500">Kemenkes RI menekankan pentingnya minimal 2 jenis protein hewani setiap hari untuk mencegah stunting.</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+          <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2">
+            <span class="px-2.5 py-0.5 bg-emerald-200 text-emerald-900 rounded-full font-bold text-[10px]">Resep 1: Usia 12+ Bulan</span>
+            <h4 class="font-bold text-slate-900 text-sm">Bubur Singkong Ikan Kembung & Telur Puyuh</h4>
+            <p class="text-slate-600 leading-relaxed">
+              Ikan kembung kaya akan Omega-3 dan DHA yang setara bahkan melebihi salmon. Dipadukan dengan telur puyuh rebus dan santan gurih.
+            </p>
+          </div>
+          <div class="p-5 rounded-2xl bg-teal-50 border border-teal-200 space-y-2">
+            <span class="px-2.5 py-0.5 bg-teal-200 text-teal-900 rounded-full font-bold text-[10px]">Resep 2: Usia 12+ Bulan</span>
+            <h4 class="font-bold text-slate-900 text-sm">Nasi Tim Hati Ayam Santan Gurih</h4>
+            <p class="text-slate-600 leading-relaxed">
+              Hati ayam segar adalah sumber zat besi heme terbaik yang sangat mudah diserap balita untuk mencegah anemia penyebab gagal tumbuh.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- SECTION 2: KADER POSYANDU VIEW -->
+    <!-- ============================================== -->
+    <div id="viewKader" class="space-y-6 hidden">
+      <!-- Sub-nav Kader -->
+      <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <span class="text-[10px] uppercase tracking-wider text-emerald-700 font-bold">Portal Kader Posyandu Melati A1</span>
+          <h2 class="text-lg font-bold text-slate-900">Sesi Hari Buka Posyandu • Oktober 2026</h2>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="switchKaderTab('dashboard')" id="kaderTabBtnDash" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white shadow-xs">
+            Dasbor SKDN & Balita
+          </button>
+          <button onclick="switchKaderTab('measure')" id="kaderTabBtnMeasure" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+            + Input Pengukuran Cepat
+          </button>
+          <button onclick="switchKaderTab('register')" id="kaderTabBtnRegister" class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+            + Daftarkan Balita Baru
+          </button>
+        </div>
+      </div>
+
+      <!-- Dasbor SKDN -->
+      <div id="kaderTabDashboard" class="space-y-6">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Sasaran Balita (S)</span>
+            <div class="text-2xl font-black text-slate-900 mt-1">42 Anak</div>
+            <span class="text-[11px] text-slate-400 mt-0.5 block">100% Punya KIA/KMS</span>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ditimbang (D / S)</span>
+            <div class="text-2xl font-black text-emerald-700 mt-1">38 / 42</div>
+            <span class="text-[11px] text-emerald-700 font-bold mt-0.5 block">Cakupan: 90.4%</span>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs">
+            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Naik Berat Badan (N)</span>
+            <div class="text-2xl font-black text-emerald-700 mt-1">31 Anak</div>
+            <span class="text-[11px] text-emerald-700 font-bold mt-0.5 block">Efektivitas: 81.5%</span>
+          </div>
+          <div class="bg-white p-4 rounded-2xl border border-amber-200 bg-amber-50/40 shadow-xs">
+            <span class="text-[10px] font-bold text-amber-800 uppercase tracking-wider">Perhatian Khusus</span>
+            <div class="text-2xl font-black text-amber-700 mt-1">2 Kasus</div>
+            <span class="text-[11px] text-amber-700 font-bold mt-0.5 block">1 Stunting, 1 Gizi Kurang</span>
+          </div>
+        </div>
+
+        <!-- Tabel Balita Kader -->
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-center gap-3">
+            <h3 class="font-extrabold text-slate-900 text-sm">Daftar Balita Posyandu Melati A1</h3>
+            <input type="text" placeholder="Cari nama anak..." class="text-xs px-3.5 py-2 border border-slate-200 rounded-xl bg-slate-50 w-full sm:w-64 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+          </div>
+          <div class="overflow-x-auto border border-slate-200 rounded-xl">
+            <table class="w-full text-xs text-left">
+              <thead class="bg-slate-100 text-slate-800 font-bold border-b border-slate-200">
+                <tr>
+                  <th class="p-3">Nama Balita</th>
+                  <th class="p-3">JK / Usia</th>
+                  <th class="p-3">Orang Tua / HP</th>
+                  <th class="p-3">Status Terakhir</th>
+                  <th class="p-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 bg-white">
+                <tr>
+                  <td class="p-3 font-bold text-slate-900">Arka Pradana</td>
+                  <td class="p-3">L / 14 Bulan</td>
+                  <td class="p-3">Ibu Ratna Dewi (081234567890)</td>
+                  <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">Normal (+0.24 SD)</span></td>
+                  <td class="p-3 text-right">
+                    <button onclick="openInputForm('Arka Pradana')" class="text-emerald-700 font-bold hover:underline">Ukur Baru</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="p-3 font-bold text-slate-900">Kirana Putri</td>
+                  <td class="p-3">P / 22 Bulan</td>
+                  <td class="p-3">Ibu Siti Aminah (081398765432)</td>
+                  <td class="p-3"><span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800">⚠️ Stunted & 2T</span></td>
+                  <td class="p-3 text-right">
+                    <button onclick="openWhatsAppModal('Kirana Putri', 'Ibu Siti Aminah', '081398765432')" class="text-emerald-700 font-bold hover:underline">Kirim WA PMT</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Pengukuran Cepat -->
+      <div id="kaderTabMeasure" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6 max-w-2xl mx-auto hidden">
+        <h3 class="font-extrabold text-slate-900 text-base">Input Antropometri & Kalkulator Z-Score WHO</h3>
+        <form onsubmit="handleFormMeasureSubmit(event)" class="space-y-4 text-xs">
+          <div>
+            <label class="block font-bold text-slate-700 mb-1">Pilih Balita</label>
+            <select class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50 font-bold">
+              <option>Arka Pradana (Laki-laki, 14 Bulan)</option>
+              <option>Kirana Putri (Perempuan, 22 Bulan)</option>
+              <option>Rafi Ahmad (Laki-laki, 28 Bulan)</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Berat Badan (kg)</label>
+              <input type="number" id="inputWeight" step="0.05" value="10.1" oninput="calcLiveZScore()" class="w-full p-3 border border-slate-200 rounded-xl font-mono text-base font-bold" required>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Panjang/Tinggi Badan (cm)</label>
+              <input type="number" id="inputHeight" step="0.1" value="78.5" oninput="calcLiveZScore()" class="w-full p-3 border border-slate-200 rounded-xl font-mono text-base font-bold" required>
+            </div>
+          </div>
+          <!-- Live Preview Box -->
+          <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
+            <span class="font-bold text-emerald-950 block">Hasil Kalkulasi Standar WHO 2006:</span>
+            <div id="liveZScoreText" class="text-emerald-800 font-semibold">
+              BB/U: <strong>+0.24 SD (Gizi Baik)</strong> • PB/U: <strong>-0.32 SD (Normal)</strong> • Status: <strong>Naik (N)</strong>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button type="button" onclick="switchKaderTab('dashboard')" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold">Batal</button>
+            <button type="submit" class="px-6 py-2 bg-emerald-700 text-white rounded-xl font-bold shadow-sm">Simpan Pengukuran</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Form Pendaftaran Balita -->
+      <div id="kaderTabRegister" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-6 max-w-2xl mx-auto hidden">
+        <h3 class="font-extrabold text-slate-900 text-base">Pendaftaran Balita Baru ke Posyandu</h3>
+        <form onsubmit="handleFormRegisterSubmit(event)" class="space-y-4 text-xs">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Nama Lengkap Balita *</label>
+              <input type="text" placeholder="Contoh: Muhammad Haidar" class="w-full p-3 border border-slate-200 rounded-xl" required>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">NIK Anak (16 Digit) *</label>
+              <input type="text" placeholder="317104xxxxxxxxxx" class="w-full p-3 border border-slate-200 rounded-xl font-mono" required>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">Nama Ibu / Ayah</label>
+              <input type="text" placeholder="Nama orang tua" class="w-full p-3 border border-slate-200 rounded-xl" required>
+            </div>
+            <div>
+              <label class="block font-bold text-slate-700 mb-1">No WhatsApp Aktif</label>
+              <input type="text" placeholder="081234567890" class="w-full p-3 border border-slate-200 rounded-xl font-mono" required>
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+            <button type="button" onclick="switchKaderTab('dashboard')" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold">Batal</button>
+            <button type="submit" class="px-6 py-2 bg-emerald-700 text-white rounded-xl font-bold shadow-sm">Daftarkan Balita</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modal Dokumen KMS Cetak / PDF -->
+  <div id="modalKms" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto hidden">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 space-y-6">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-4">
+        <div>
+          <span class="text-[10px] uppercase font-bold text-emerald-700">Dokumen KMS Digital Resmi</span>
+          <h3 class="font-extrabold text-slate-900 text-lg">Kartu Menuju Sehat • Kemenkes RI</h3>
+        </div>
+        <button onclick="closeKmsModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center font-bold">✕</button>
+      </div>
+      <div class="space-y-4 text-xs text-slate-700">
+        <div class="grid grid-cols-2 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div><span class="text-slate-400 block text-[10px]">Nama Balita:</span><strong class="text-slate-900 text-sm" id="modalChildName">Arka Pradana</strong></div>
+          <div><span class="text-slate-400 block text-[10px]">NIK:</span><strong class="font-mono text-slate-800">3171041408250001</strong></div>
+          <div><span class="text-slate-400 block text-[10px]">Tanggal Lahir:</span><strong class="text-slate-800">14 Agustus 2025</strong></div>
+          <div><span class="text-slate-400 block text-[10px]">Faskes / Posyandu:</span><strong class="text-slate-800">Posyandu Melati A1 • Puskesmas Dempo</strong></div>
+        </div>
+        <p class="leading-relaxed">Dokumen ini memuat data pertumbuhan fisik anak yang diselaraskan dengan standar baku WHO 2006. Sah dipergunakan untuk pemeriksaan di Posyandu, Puskesmas, dan Rumah Sakit.</p>
+      </div>
+      <div class="flex justify-end gap-3 pt-4 border-t border-slate-100">
+        <button onclick="closeKmsModal()" class="px-4 py-2 border border-slate-200 rounded-xl text-slate-600 font-semibold text-xs">Tutup</button>
+        <button onclick="window.print()" class="px-5 py-2 bg-emerald-700 text-white rounded-xl font-bold text-xs shadow-md">🖨 Cetak / Simpan PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal WhatsApp Simulator -->
+  <div id="modalWhatsApp" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden">
+      <div class="bg-[#075E54] text-white p-4 flex justify-between items-center">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-sm">Kirim WhatsApp Intervensi Posyandu</span>
+        </div>
+        <button onclick="closeWhatsAppModal()" class="text-white hover:opacity-80">✕</button>
+      </div>
+      <div class="p-5 bg-[#EFEAE2] space-y-3 text-xs">
+        <div class="bg-white p-4 rounded-xl shadow-xs space-y-2">
+          <div class="text-[10px] text-slate-400 border-b pb-1">Draf Pesan Resmi Posyandu:</div>
+          <p id="waMessageContent" class="text-slate-800 leading-relaxed">
+            Yth. Ibu Siti Aminah, salam sehat dari Kader Posyandu Melati A1. Berdasarkan hasil penimbangan ananda Kirana Putri (22 bulan), kami mengundang Ibu untuk konsultasi santai dan menerima paket PMT Pemulihan Pangan Lokal pada Sabtu, 14 November 2026. Terima kasih!
+          </p>
+        </div>
+      </div>
+      <div class="p-4 bg-white border-t border-slate-200 flex justify-end gap-2">
+        <button onclick="closeWhatsAppModal()" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">Tutup</button>
+        <button onclick="sendWaMessage()" class="px-5 py-2 rounded-xl bg-[#25D366] text-white text-xs font-bold shadow-sm">Kirim Pesan WA</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="appToast" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl text-xs font-medium border border-slate-700 hidden">
+    <span id="toastText">Pesan pemberitahuan</span>
+  </div>
+
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+    PantauGizi Balita Prototype File • Berjalan Offline & Standar Baku WHO 2006
+  </footer>
+
+  <!-- Script Interaktif Standalone -->
+  <script>
+    let currentRole = 'PARENT';
+    let currentChild = 'ch-01';
+
+    function switchRole(role) {
+      currentRole = role;
+      document.getElementById('viewParent').classList.toggle('hidden', role !== 'PARENT');
+      document.getElementById('viewKader').classList.toggle('hidden', role !== 'KADER');
+
+      // Update button styles
+      document.getElementById('btnRoleParent').className = role === 'PARENT' ? 'px-3.5 py-2 rounded-xl transition bg-white text-emerald-700 shadow-sm font-bold' : 'px-3.5 py-2 rounded-xl transition text-slate-600 hover:text-slate-900';
+      document.getElementById('btnRoleKader').className = role === 'KADER' ? 'px-3.5 py-2 rounded-xl transition bg-white text-emerald-700 shadow-sm font-bold' : 'px-3.5 py-2 rounded-xl transition text-slate-600 hover:text-slate-900';
+
+      showToast('Beralih peran ke: ' + (role === 'PARENT' ? 'Orang Tua' : 'Kader Posyandu'));
+    }
+
+    function switchParentTab(tab) {
+      document.getElementById('parentTabSummary').classList.toggle('hidden', tab !== 'summary');
+      document.getElementById('parentTabChart').classList.toggle('hidden', tab !== 'chart');
+      document.getElementById('parentTabImmunization').classList.toggle('hidden', tab !== 'immunization');
+      document.getElementById('parentTabAdvice').classList.toggle('hidden', tab !== 'advice');
+
+      const tabs = ['Summary', 'Chart', 'Immunization', 'Advice'];
+      tabs.forEach(t => {
+        const btn = document.getElementById('tabBtn' + t);
+        if (btn) {
+          if (t.toLowerCase() === tab) {
+            btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white shadow-xs';
+          } else {
+            btn.className = 'px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100';
+          }
+        }
+      });
+    }
+
+    function switchKaderTab(tab) {
+      document.getElementById('kaderTabDashboard').classList.toggle('hidden', tab !== 'dashboard');
+      document.getElementById('kaderTabMeasure').classList.toggle('hidden', tab !== 'measure');
+      document.getElementById('kaderTabRegister').classList.toggle('hidden', tab !== 'register');
+
+      document.getElementById('kaderTabBtnDash').className = tab === 'dashboard' ? 'px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white shadow-xs' : 'px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100';
+      document.getElementById('kaderTabBtnMeasure').className = tab === 'measure' ? 'px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white shadow-xs' : 'px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100';
+      document.getElementById('kaderTabBtnRegister').className = tab === 'register' ? 'px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-700 text-white shadow-xs' : 'px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100';
+    }
+
+    function onSelectChild(childId) {
+      currentChild = childId;
+      if (childId === 'ch-03') {
+        document.getElementById('summaryBbuStatus').innerText = 'Gizi Kurang';
+        document.getElementById('summaryBbuZScore').innerText = '-2.35 SD (Perlu PMT)';
+        document.getElementById('summaryPbuStatus').innerText = 'Pendek (Stunted)';
+        document.getElementById('summaryPbuZScore').innerText = '-2.18 SD • Perlu Intervensi';
+        document.getElementById('summaryBbpbStatus').innerText = 'Gizi Kurang (Wasted)';
+        document.getElementById('summaryLila').innerText = '12.1 cm';
+        document.getElementById('kmsBannerTitle').innerText = 'Kartu Menuju Sehat • Kirana Putri';
+        document.getElementById('parentChildAvatar').innerText = 'K';
+      } else {
+        document.getElementById('summaryBbuStatus').innerText = 'Gizi Baik (Normal)';
+        document.getElementById('summaryBbuZScore').innerText = '+0.24 SD (Normal)';
+        document.getElementById('summaryPbuStatus').innerText = 'Normal';
+        document.getElementById('summaryPbuZScore').innerText = '-0.32 SD • Optimal';
+        document.getElementById('summaryBbpbStatus').innerText = 'Gizi Baik (Normal)';
+        document.getElementById('summaryLila').innerText = '14.5 cm';
+        document.getElementById('kmsBannerTitle').innerText = 'Kartu Menuju Sehat • Arka Pradana';
+        document.getElementById('parentChildAvatar').innerText = 'A';
+      }
+      showToast('Memuat data balita: ' + (childId === 'ch-03' ? 'Kirana Putri' : 'Arka Pradana'));
+    }
+
+    function toggleRsvp() {
+      const badge = document.getElementById('rsvpBadge');
+      if (badge.innerText.includes('Terkonfirmasi')) {
+        badge.innerText = 'Izin Berhalangan';
+        badge.className = 'inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-200 text-slate-700';
+      } else {
+        badge.innerText = 'Terkonfirmasi Hadir';
+        badge.className = 'inline-block mt-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800';
+      }
+      showToast('Status kehadiran Posyandu berhasil diperbarui.');
+    }
+
+    function calcLiveZScore() {
+      const w = parseFloat(document.getElementById('inputWeight').value) || 0;
+      const h = parseFloat(document.getElementById('inputHeight').value) || 0;
+      const bbu = (w - 10.0) / 1.0;
+      const pbu = (h - 78.0) / 2.5;
+      document.getElementById('liveZScoreText').innerHTML = 
+        `BB/U: <strong>${bbu >= 0 ? '+' : ''}${bbu.toFixed(2)} SD</strong> • PB/U: <strong>${pbu >= 0 ? '+' : ''}${pbu.toFixed(2)} SD</strong> • Kategori: <strong>${bbu < -2 ? 'Gizi Kurang' : 'Normal'}</strong>`;
+    }
+
+    function openInputForm(childName) {
+      switchRole('KADER');
+      switchKaderTab('measure');
+    }
+
+    function handleFormMeasureSubmit(e) {
+      e.preventDefault();
+      showToast('Pengukuran berhasil disimpan & diverifikasi standar WHO!');
+      switchKaderTab('dashboard');
+    }
+
+    function handleFormRegisterSubmit(e) {
+      e.preventDefault();
+      showToast('Balita baru berhasil didaftarkan ke Posyandu!');
+      switchKaderTab('dashboard');
+    }
+
+    function openKmsModal() {
+      document.getElementById('modalKms').classList.remove('hidden');
+    }
+
+    function closeKmsModal() {
+      document.getElementById('modalKms').classList.add('hidden');
+    }
+
+    function openWhatsAppModal(child, parent, phone) {
+      document.getElementById('waMessageContent').innerText = 
+        `Yth. ${parent}, salam sehat dari Posyandu Melati A1. Berdasarkan hasil pengukuran ananda ${child}, kami mengundang Ibu untuk konsultasi gizi santai dan menerima paket PMT Pemulihan Pangan Lokal pada Sabtu, 14 November 2026. Terima kasih!`;
+      document.getElementById('modalWhatsApp').classList.remove('hidden');
+    }
+
+    function closeWhatsAppModal() {
+      document.getElementById('modalWhatsApp').classList.add('hidden');
+    }
+
+    function sendWaMessage() {
+      closeWhatsAppModal();
+      showToast('Pesan WhatsApp intervensi gizi berhasil dikirimkan!');
+    }
+
+    function downloadCsvEppgbm() {
+      const csv = "No,NIK,Nama Balita,Tanggal Lahir,JK,Nama Orang Tua,BB,TB,Z-Score BB/U,Status\\n1,3171041408250001,Arka Pradana,2025-08-14,L,Ibu Ratna Dewi,10.1,78.5,+0.24,Normal\\n2,3171042212240003,Kirana Putri,2024-12-22,P,Ibu Siti Aminah,9.3,77.0,-2.35,Gizi Kurang";
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'ePPGBM_PuskesmasDempo_Oktober2026.csv';
+      a.click();
+      showToast('Format CSV e-PPGBM berhasil diunduh.');
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('appToast');
+      document.getElementById('toastText').innerText = msg;
+      toast.classList.remove('hidden');
+      setTimeout(() => { toast.classList.add('hidden'); }, 3500);
+    }
+  </script>
+</body>
+</html>
